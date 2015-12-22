@@ -214,5 +214,11 @@ func (m *SyslogMessage) Timestamp() string {
 }
 
 func (m *SyslogMessage) ContainerName() string {
+	if val, ok := m.Message.Container.Config.Labels["io.rancher.stack_service.name"]; ok {
+		return val
+	}
+	if val, ok := m.Message.Container.Config.Labels["io.rancher.project_service.name"]; ok {
+		return val
+	}
 	return m.Message.Container.Name[1:]
 }

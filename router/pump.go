@@ -59,6 +59,10 @@ func ignoreContainer(container *docker.Container) bool {
 		if len(kvp) == 2 && kvp[0] == "LOGSPOUT" && strings.ToLower(kvp[1]) == "ignore" {
 			return true
 		}
+		// ignore rancher system containers
+		if _, ok := container.Config.Labels["io.rancher.container.system"]; ok {
+			return true
+		}
 	}
 	return false
 }
@@ -121,13 +125,14 @@ func (p *LogsPump) pumpLogs(event *docker.APIEvents, backlog bool) {
 	id := normalID(event.ID)
 	container, err := p.client.InspectContainer(id)
 	assert(err, "pump")
-	if container.Config.Tty {
-		debug("pump:", id, "ignored: tty enabled")
-		return
-	}
 	if ignoreContainer(container) {
 		debug("pump:", id, "ignored: environ ignore")
 		return
+	}
+	var useRawTerminal bool
+	if container.Config.Tty {
+		debug("pump:", id, ": tty enabled -> using RawTerminal")
+		useRawTerminal = true
 	}
 	var tail string
 	if backlog {
@@ -151,6 +156,7 @@ func (p *LogsPump) pumpLogs(event *docker.APIEvents, backlog bool) {
 			Stderr:       true,
 			Follow:       true,
 			Tail:         tail,
+			RawTerminal:  useRawTerminal,
 		})
 		if err != nil {
 			debug("pump:", id, "stopped:", err)
