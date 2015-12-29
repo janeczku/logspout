@@ -41,9 +41,9 @@ func NewSyslogAdapter(route *router.Route) (router.LogAdapter, error) {
 
 	format := getopt("SYSLOG_FORMAT", "rfc5424")
 	priority := getopt("SYSLOG_PRIORITY", "{{.Priority}}")
-	hostname := getopt("SYSLOG_HOSTNAME", "{{.Container.Config.Hostname}}")
+	hostname := getopt("SYSLOG_HOSTNAME", "{{.Hostname}}")
 	pid := getopt("SYSLOG_PID", "{{.Container.State.Pid}}")
-	tag := getopt("SYSLOG_TAG", "{{.ContainerName}}"+route.Options["append_tag"])
+	tag := getopt("SYSLOG_TAG", "{{.TagName}}"+route.Options["append_tag"])
 	structuredData := getopt("SYSLOG_STRUCTURED_DATA", "")
 	if route.Options["structured_data"] != "" {
 		structuredData = route.Options["structured_data"]
@@ -206,14 +206,6 @@ func (m *SyslogMessage) Priority() syslog.Priority {
 }
 
 func (m *SyslogMessage) Hostname() string {
-	return hostname
-}
-
-func (m *SyslogMessage) Timestamp() string {
-	return m.Message.Time.Format(time.RFC3339)
-}
-
-func (m *SyslogMessage) ContainerName() string {
 	if val, ok := m.Message.Container.Config.Labels["io.rancher.stack_service.name"]; ok {
 		return val
 	}
@@ -221,4 +213,15 @@ func (m *SyslogMessage) ContainerName() string {
 		return val
 	}
 	return m.Message.Container.Name[1:]
+}
+
+func (m *SyslogMessage) Timestamp() string {
+	return m.Message.Time.Format(time.RFC3339)
+}
+
+func (m *SyslogMessage) TagName() string {
+	if val := m.Message.Container.Config.Hostname; len(val) > 0 {
+		return val
+	}
+	return hostname
 }

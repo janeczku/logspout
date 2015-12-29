@@ -7,7 +7,7 @@ This is a fork of [logspout](https://github.com/gliderlabs/logspout) optimized f
 * Enhancement: Adds [Logstash adapter](https://github.com/looplab/logspout-logstash)
 * Bugfix: Broken logging for containers that have `tty` enabled (which is the default in Rancher UI)
 * Enhancement: Ignores Rancher system containers
-* Enhancement: Uses Rancher UI service names in log messages tag/name fields
+* Enhancement: Uses Rancher service name as syslog hostname and container-name as tag
 * Updates base image to Alpine 3.2
 * Builds with Go 1.4
 
