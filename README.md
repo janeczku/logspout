@@ -5,11 +5,18 @@ This is a fork of [logspout](https://github.com/gliderlabs/logspout) optimized f
 **Changes**
 
 * Enhancement: Adds [Logstash adapter](https://github.com/looplab/logspout-logstash)
-* Bugfix: Broken logging for containers that have `tty` enabled (which is the default in Rancher UI)
+* Bugfix: Broken logging for containers that have `tty` enabled (which is the default for services created in Rancher UI)
 * Enhancement: Ignores Rancher system containers
 * Enhancement: Uses Rancher service name as syslog hostname and container-name as tag
 * Updates base image to Alpine 3.2
 * Builds with Go 1.4
+
+## Usage
+
+In Rancher UI navigate to ADMIN => SETTINGS and add a new catalog using the following URL:
+`https://github.com/janeczku/rancher-catalog.git`
+
+This will make available a new catalog entry named `Logspout-Rancher` in APPLICATIONS => CATALOG.
 
 ---
 
