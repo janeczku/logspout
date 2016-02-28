@@ -2,6 +2,10 @@ FROM gliderlabs/alpine:3.2
 VOLUME /mnt/routes
 EXPOSE 8000
 
+RUN apk add --update ca-certificates \
+  && apk del ca-certificates \
+  && rm -rf /var/cache/apk/*
+
 COPY . /src
 RUN cd /src && ./build.sh "$(cat VERSION)"
 
